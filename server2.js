@@ -53,6 +53,22 @@ const getUserByIdHander = (req, res, id) => {
     }
 }
 
+// Route for POST /api/users
+const createUserHandler = async (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const newUser = JSON.parse(body);
+        newUser.id = users.length + 1;
+        users.push(newUser);
+        res.writeHead(201);
+        res.end(JSON.stringify(newUser));
+    });
+}
+
+
 // Not Found handler
 const notFoundHandler = (req, res) => {
     res.writeHead(404);
@@ -72,6 +88,8 @@ const createServer = http.createServer(async (req, res) => {
                     getUsersHandler(req, res);
                 } else if (req.method === 'GET' && req.url.startsWith('/api/users/')) {
                     getUserByIdHander(req, res);
+                }else if( req.method === 'POST' && req.url === '/api/users') {
+                    createUserHandler(req, res);
                 } else {
                     notFoundHandler(req, res);
                 }
@@ -92,4 +110,4 @@ const createServer = http.createServer(async (req, res) => {
 
 createServer.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
-});
+});         
